@@ -19,7 +19,7 @@ for filename in os.listdir(csv_directory):
         plt.ylabel('Delay (ms)')
         plt.title(f'Airplane Delay Plot for {filename}')
         plt.grid(True)
-        plt.savefig(f'{filename}_delay_plot.png')
+        plt.savefig(f'{filename}_delay_plot_2.png')
         plt.close()  # Close the plot to avoid overlapping in the next iteration
 
 print("Plots generated for all CSV files!")

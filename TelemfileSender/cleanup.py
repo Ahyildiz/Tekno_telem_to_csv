@@ -13,6 +13,14 @@ def remove_constant_increase_from_end(filename):
         df.to_csv(filename, index=False)
         print("Last row dropped")
 
+    #do this from beginning to end
+    while df.head(1)['iha_enlem'].values == df.iloc[1]['iha_enlem'] and df.head(1)['iha_boylam'].values == df.iloc[1]['iha_boylam'] and df.head(1)['iha_irtifa'].values == df.iloc[1]['iha_irtifa'] and df.head(1)['iha_dikilme'].values == df.iloc[1]['iha_dikilme'] and df.head(1)['iha_yonelme'].values == df.iloc[1]['iha_yonelme'] and df.head(1)['iha_yatis'].values == df.iloc[1]['iha_yatis']:
+        #drop the first row
+        df.drop(df.head(1).index, inplace=True)
+        #save the new csv file
+        df.to_csv(filename, index=False)
+        print("First row dropped")
+
 
 if __name__ == "__main__":
 
