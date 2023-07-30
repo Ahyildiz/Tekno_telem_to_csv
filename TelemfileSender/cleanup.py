@@ -4,6 +4,8 @@ import pandas as pd
 def remove_constant_increase_from_end(filename):
     # Read the CSV file into a pandas DataFrame
     df = pd.read_csv(filename)
+    # check if max value for the zaman_farki column is greater than 20000
+
 
     #do this until the last row is not the same as the row before it
     while df.tail(1)['iha_enlem'].values == df.iloc[-2]['iha_enlem'] and df.tail(1)['iha_boylam'].values == df.iloc[-2]['iha_boylam'] and df.tail(1)['iha_irtifa'].values == df.iloc[-2]['iha_irtifa'] and df.tail(1)['iha_dikilme'].values == df.iloc[-2]['iha_dikilme'] and df.tail(1)['iha_yonelme'].values == df.iloc[-2]['iha_yonelme'] and df.tail(1)['iha_yatis'].values == df.iloc[-2]['iha_yatis']:
@@ -20,7 +22,6 @@ def remove_constant_increase_from_end(filename):
         #save the new csv file
         df.to_csv(filename, index=False)
         print("First row dropped")
-
 
 if __name__ == "__main__":
 
