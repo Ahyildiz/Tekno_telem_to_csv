@@ -1,14 +1,13 @@
 import pandas as pd
 import os
-
-
+import torch
+print(torch.cuda.is_available(), torch.cuda.device_count())
 def has_multiple_local_maxima(df, threshold, window_size=3):
     # Create a rolling window to find local maxima
     rolling_max = df['zaman_farki'].rolling(window=window_size, center=True).max()
 
     # Check if there are multiple local maxima above the threshold
     local_maxima = (df['zaman_farki'] == rolling_max) & (rolling_max > threshold)
-
     return local_maxima.sum()
 
 
@@ -36,9 +35,3 @@ for file in only_one_maxima_files:
     file_path = os.path.join(folder_path, file)
     df = pd.read_csv(file_path)
     #from beginnig to the maxima
-    df1 = df.iloc[:df['zaman_farki'].idxmax()]
-    df1.to_csv(os.path.join(folder_path, file[:-4] + "_1.csv"), index=False)
-    #from maxima to the end
-    df2 = df.iloc[df['zaman_farki'].idxmax():]
-    df2.to_csv(os.path.join(folder_path, file[:-4] + "_2.csv"), index=False)
-
