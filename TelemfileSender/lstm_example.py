@@ -55,7 +55,7 @@ model.add(Dense(df_scaled.shape[1]))
 model.compile(optimizer='adam', loss='mse')
 
 # Train the model
-model.fit(X_train, y_train, epochs=10000, batch_size=64, verbose=1)
+model.fit(X_train, y_train, epochs=1000, batch_size=64, verbose=1)
 
 # Make predictions on the test data
 y_pred = model.predict(X_test)
