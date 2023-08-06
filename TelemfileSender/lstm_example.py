@@ -5,6 +5,8 @@ from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
 
+import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))
+
 # Load the CSV data into a DataFrame
 df = pd.read_csv('C:\\Users\\ahyil\\PycharmProjects\\Tekno_telem_to_csv\\csv_files\\aircraft_11_6.csv')
 
