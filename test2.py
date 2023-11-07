@@ -1,11 +1,24 @@
+import time
 from math import sqrt
+
 
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from datetime import datetime
 import matplotlib.pyplot as plt
+from threading import Thread
+import tkinter as tk
+from tkinter import filedialog
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg,
+    NavigationToolbar2Tk,
+)
 
+import matplotlib
+
+matplotlib.use('TkAgg')
 # Load the CSV data into a Pandas DataFrame
 data = pd.read_csv('C:\\Users\\ahyil\\PycharmProjects\\Tekno_telem_to_csv\\new2.csv')
 
@@ -15,6 +28,10 @@ data['sent_time'] = data['sent_time'].apply(lambda x: datetime.strptime(x, '%H:%
 # Calculate the time difference between data points
 data['time_diff'] = (data['sent_time'] - data['sent_time'].shift()).dt.total_seconds()
 data['time_diff'].fillna(0, inplace=True)
+
+
+def twoDistance(x1, y1, x2, y2):
+    return sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 # Function to create a rolling window of the last 5 data points
 def create_rolling_window(data, window_size=10):
@@ -76,13 +93,69 @@ for i in range(len(predicted_states)):
     print("error: ", sqrt(errx**2+erry**2))
     print()
 
-# Plot "enlem" and "boylam" for predicted and real values in a 2D plane
-plt.figure(figsize=(12, 6))
-plt.scatter(predicted_enlem, predicted_boylam, label='Predicted')
-plt.scatter(actual_enlem, actual_boylam, label='Actual')
-plt.xlabel('Enlem')
-plt.ylabel('Boylam')
-plt.title('Predicted vs. Actual in 2D Plane')
-plt.legend()
-plt.grid(True)
-plt.show()
+def drawThread(ax):
+    # Plot "enlem" and "boylam" for predicted and real values in a 2D plane
+    time.sleep(2)
+    predctArr=[]
+    actualArr=[]
+    maxDistance = 0
+    for i in range(len(predicted_enlem)):
+        if(len(predctArr)<30):
+            predctArr.append([predicted_enlem[i], predicted_boylam[i]])
+            actualArr.append([actual_enlem[i], actual_boylam[i]])
+        else:
+            predctArr.pop(0)
+            actualArr.pop(0)
+            predctArr.append([predicted_enlem[i], predicted_boylam[i]])
+            actualArr.append([actual_enlem[i], actual_boylam[i]])
+
+        ax.clear()
+        ax.plot([x[0] for x in predctArr], [x[1] for x in predctArr], 'r',label="predicted")
+        ax.plot([x[0] for x in actualArr], [x[1] for x in actualArr], 'b',label="actual")
+
+
+        distance = twoDistance(predicted_enlem[i], predicted_boylam[i], actual_enlem[i], actual_boylam[i])
+        distancestr=float('{0:.2f}'.format(distance))
+        ax.text(1400, 1600, "distance: " + str(distancestr))
+        if (distance > maxDistance):
+            maxDistance = distance
+
+
+        time.sleep(0.04)
+        ax.legend()
+        ax.set_xlim(1000, 1800)
+        ax.set_ylim(1500, 1800)
+        canvas.draw()
+
+    print("maxDistance: ", maxDistance)
+
+    ax.arrow(1380, 1650, 1 , 1 , width=1, color='r',
+                  head_starts_at_zero=True,
+                  length_includes_head=True, clip_on=False)
+
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.configure(background="white")
+    root.geometry("1500x1050")
+    root.resizable(0, 0)
+    fig = Figure(figsize=(6, 4), dpi=100)
+    canvas = FigureCanvasTkAgg(fig, master=root)
+
+    canvas.get_tk_widget().place(x=0, y=50, width=1400, height=900)
+    canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+    imagecanvas = tk.Canvas(root, width=50, height=50, bg="white")
+
+    toolbarFrame = tk.Frame(master=root)
+    toolbarFrame.place(x=0, y=0, width=370, height=42)
+    toolbar = NavigationToolbar2Tk(canvas, toolbarFrame)
+
+    ax = fig.subplots()
+    ax.set_xlim(1300, 1800)
+    ax.set_ylim(1000, 1500)
+    Thread(target=drawThread, args=(ax,)).start()
+
+    root.mainloop()
+
