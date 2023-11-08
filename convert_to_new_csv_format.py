@@ -37,7 +37,6 @@ df['sent_time'] = (df['timestamp'] - pd.to_timedelta(df['zaman_farki'], unit='ms
 
 # Drop the 'zaman_farki' column
 df = df.drop(columns=['zaman_farki'])
-df = df.drop(columns=['timestamp'])
 df = df.drop(columns=['takim_numarasi'])
 
 # Reorder the columns to take the 'sent_time' column to the front
@@ -47,6 +46,10 @@ df = df.drop(columns=['takim_numarasi'])
 df['iha_enlem_meters'] = df.apply(lambda row: haversine(ref_latitude, ref_longitude, row['iha_enlem'], ref_longitude), axis=1)
 df['iha_boylam_meters'] = df.apply(lambda row: haversine(ref_latitude, ref_longitude, ref_latitude, row['iha_boylam']), axis=1)
 df = df.drop(columns=['iha_enlem', 'iha_boylam'])
+df['timestamp'] = df['timestamp'].dt.strftime('%H:%M:%S.%f')
+#remove miliseconds from timestamp
+df['timestamp'] = df['timestamp'].str[:-7]
+
 
 #reorder the columns to take the 'iha_enlem_meters' and 'iha_boylam_meters' columns to the front
 cols = df.columns.tolist()

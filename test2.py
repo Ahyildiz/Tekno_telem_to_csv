@@ -1,7 +1,6 @@
 import time
 from math import sqrt
 
-
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
@@ -31,7 +30,8 @@ data['time_diff'].fillna(0, inplace=True)
 
 
 def twoDistance(x1, y1, x2, y2):
-    return sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    return sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
 
 # Function to create a rolling window of the last 5 data points
 def create_rolling_window(data, window_size=10):
@@ -39,12 +39,15 @@ def create_rolling_window(data, window_size=10):
     targets = []
     for i in range(len(data) - window_size):
         feature_window = data.iloc[i:i + window_size][
-            ['iha_enlem_meters', 'iha_boylam_meters', 'iha_irtifa', 'iha_dikilme', 'iha_yonelme', 'iha_yatis', 'time_diff']].values
+            ['iha_enlem_meters', 'iha_boylam_meters', 'iha_irtifa', 'iha_dikilme', 'iha_yonelme',
+             'iha_yatis', 'time_diff']].values
         target = data.iloc[i + window_size][
-            ['iha_enlem_meters', 'iha_boylam_meters', 'iha_irtifa', 'iha_dikilme', 'iha_yonelme', 'iha_yatis']].values
+            ['iha_enlem_meters', 'iha_boylam_meters', 'iha_irtifa', 'iha_dikilme', 'iha_yonelme',
+             'iha_yatis']].values
         features.append(feature_window)
         targets.append(target)
     return np.array(features), np.array(targets)
+
 
 # Create features and targets using the rolling window
 X, y = create_rolling_window(data, window_size=10)
@@ -90,17 +93,18 @@ for i in range(len(predicted_states)):
     print(y[i])
     errx = predicted_states[i][0] - y[i][0]
     erry = predicted_states[i][1] - y[i][1]
-    print("error: ", sqrt(errx**2+erry**2))
+    print("error: ", sqrt(errx ** 2 + erry ** 2))
     print()
+
 
 def drawThread(ax):
     # Plot "enlem" and "boylam" for predicted and real values in a 2D plane
     time.sleep(2)
-    predctArr=[]
-    actualArr=[]
+    predctArr = []
+    actualArr = []
     maxDistance = 0
     for i in range(len(predicted_enlem)):
-        if(len(predctArr)<30):
+        if (len(predctArr) < 30):
             predctArr.append([predicted_enlem[i], predicted_boylam[i]])
             actualArr.append([actual_enlem[i], actual_boylam[i]])
         else:
@@ -110,16 +114,14 @@ def drawThread(ax):
             actualArr.append([actual_enlem[i], actual_boylam[i]])
 
         ax.clear()
-        ax.plot([x[0] for x in predctArr], [x[1] for x in predctArr], 'r',label="predicted")
-        ax.plot([x[0] for x in actualArr], [x[1] for x in actualArr], 'b',label="actual")
-
+        ax.plot([x[0] for x in predctArr], [x[1] for x in predctArr], 'r', label="predicted")
+        ax.plot([x[0] for x in actualArr], [x[1] for x in actualArr], 'b', label="actual")
 
         distance = twoDistance(predicted_enlem[i], predicted_boylam[i], actual_enlem[i], actual_boylam[i])
-        distancestr=float('{0:.2f}'.format(distance))
+        distancestr = float('{0:.2f}'.format(distance))
         ax.text(1400, 1600, "distance: " + str(distancestr))
         if (distance > maxDistance):
             maxDistance = distance
-
 
         time.sleep(0.04)
         ax.legend()
@@ -129,10 +131,9 @@ def drawThread(ax):
 
     print("maxDistance: ", maxDistance)
 
-    ax.arrow(1380, 1650, 1 , 1 , width=1, color='r',
-                  head_starts_at_zero=True,
-                  length_includes_head=True, clip_on=False)
-
+    ax.arrow(1380, 1650, 1, 1, width=1, color='r',
+             head_starts_at_zero=True,
+             length_includes_head=True, clip_on=False)
 
 
 if __name__ == '__main__':
@@ -158,4 +159,3 @@ if __name__ == '__main__':
     Thread(target=drawThread, args=(ax,)).start()
 
     root.mainloop()
-
