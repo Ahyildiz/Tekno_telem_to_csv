@@ -123,7 +123,7 @@ def drawThread(ax):
         if (distance > maxDistance):
             maxDistance = distance
 
-        time.sleep(0.04)
+        time.sleep(0.004)
         ax.legend()
         ax.set_xlim(1000, 1800)
         ax.set_ylim(1500, 1800)
