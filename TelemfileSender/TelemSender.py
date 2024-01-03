@@ -83,6 +83,22 @@ def TeknoSend(fileList, dir):
         SendMessageUDP(msg[0], "127.0.0.1", 5006, receive=False, compress=False)
         a += 1
 
+def readMessageTCP(IP='', Port=0, PacketSize=65536):
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # soketi oluştur ve client olarak ata
+    client.settimeout(0.8)
+    client.connect((IP, Port))  # soketi bağla
+    a = client.recv(PacketSize)
+    return a.decode("utf-8")
+
+def readMessageUDP(IP='', Port=0, PacketSize=65536):
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # soketi oluştur ve client olarak ata
+    client.settimeout(0.8)
+    client.connect((IP, Port))  # soketi bağla
+    a = client.recv(PacketSize)
+    return a.decode("utf-8")
+
+
+            
 
 def Telemend(telList, dir):
     b = 0

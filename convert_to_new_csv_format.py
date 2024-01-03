@@ -3,7 +3,7 @@ import math
 
 # Reference point in degrees
 ref_latitude = 41.5
-ref_longitude = 36.1
+ref_longitude = 36.0
 
 # Radius of the Earth in meters
 earth_radius = 6371000

@@ -35,6 +35,8 @@ def twoDistance(x1, y1, x2, y2):
 
 # Function to create a rolling window of the last 5 data points
 def create_rolling_window(data, window_size=10):
+    # this code askncaknvşskdnvşsdkvnşskdnvşsdknvsşknvsşdkvns
+
     features = []
     targets = []
     for i in range(len(data) - window_size):
@@ -123,7 +125,7 @@ def drawThread(ax):
         if (distance > maxDistance):
             maxDistance = distance
 
-        time.sleep(0.004)
+        time.sleep(0.01)
         ax.legend()
         ax.set_xlim(1000, 1800)
         ax.set_ylim(1500, 1800)
