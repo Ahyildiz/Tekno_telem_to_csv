@@ -18,7 +18,7 @@ def predict_new_position(current_position, heading, speed, time_interval=1):
 
 # Function to create a rolling window for the last 3 data points
 def create_rolling_window(data):
-    window_size = 3
+    window_size = 5
     rolling_windows = []
     for i in range(len(data) - window_size + 1):
         window = data.iloc[i:i + window_size]
@@ -65,11 +65,16 @@ predicted_boylam = []
 actual_enlem = []
 actual_boylam = []
 errors = []
+errors_to_north_south = [] #positive means north, negative means south
+errors_to_east_west = [] #positive means east, negative means west
+
 for i in range(len(predicted_positions)):
     predicted_enlem.append(predicted_positions[i][0])
     predicted_boylam.append(predicted_positions[i][1])
     actual_enlem.append(actual_positions[i][0])
     actual_boylam.append(actual_positions[i][1])
+    errors_to_east_west.append(predicted_positions[i][0] - actual_positions[i][0])
+    errors_to_north_south.append(predicted_positions[i][1] - actual_positions[i][1])
     errors.append(calculate_cartesian_distance(predicted_positions[i], actual_positions[i]))
 
 print("average error as a percentage of the border: ",
@@ -81,6 +86,8 @@ print("min error: ", np.min(errors), "meters")
 print("median error: ", np.median(errors), "meters")
 print("variance error: ", np.var(errors))
 print("mean squared error: ", mean_squared_error(predicted_positions, actual_positions))
+print("mean error to north/south: ", np.mean(errors_to_north_south), "meters")
+print("mean error to east/west: ", np.mean(errors_to_east_west), "meters")
 
 
 plt.figure(figsize=(8, 6))
