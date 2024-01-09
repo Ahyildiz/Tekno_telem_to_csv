@@ -1,0 +1,21 @@
+Variable Name,Symbols,Meaning
+Variance,"\(\sigma^2\), \(s^2\)",Measure of dispersion in a dataset
+Mean,\(\mu\),Average value of a dataset
+Standard Deviation,"\(\sigma\), \(s\)",Measure of the amount of variation or dispersion of a set of values
+Sample Size,\(n\),Number of observations in a sample
+Probability of Success,\(p\),Likelihood of a success in a Bernoulli trial
+Population Mean,\(\mu_{population}\),Average value of a population
+Population Proportion,\(\pi\),True proportion in a population
+Sample Mean,\(\bar{x}\),Average value of a sample
+Sample Proportion,\(\hat{p}\),Proportion in a sample
+Z-Score,\(z\),Standard deviation units from the mean in a normal distribution
+T-Score,\(t\),Scaled version of the Z-score accounting for sample size
+Chi-Square Statistic,\(\chi^2\),Statistic used to test the statistical significance of observed versus expected data
+P-Value,\(p-value\),"Probability of obtaining test results at least as extreme as the results actually observed, under the assumption that the null hypothesis is correct"
+Degree of Freedom,\(df\),Number of values in a final calculation of a statistic that are free to vary
+Expected Frequency,\(E_i\),Frequency expected in a category in a statistical test
+Observed Frequency,\(O_i\),Frequency observed in a category in a statistical test
+Error Term,\(e\),Difference between observed and estimated values
+Regression Coefficient,\(\beta\),Indicator of the amount of change in the dependent variable that is due to the independent variable
+Correlation Coefficient,\(r\),Measure of the strength and direction of association between two variables
+Covariance,"\(cov(X,Y)\)",Measure of the joint variability of two random variables
