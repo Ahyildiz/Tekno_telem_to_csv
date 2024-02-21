@@ -109,7 +109,6 @@ def Telemend(telList, dir):
         msg = Read(dir + telList[b])
         msg = json.loads(msg[0])
         fulmes = msg
-
         msg = msg["telem"]
         msg = [json.dumps(msg)]
         try:  # tcp bağlantılarını tryın içine yaz
