@@ -7,8 +7,12 @@ import os
 import socket
 import zlib
 import keyboard
+import pandas as pd
+
+# Assuming window is a list of dictionaries
 
 from sklearn.linear_model import LinearRegression
+
 
 def listenTCP(IP='', Port=0, PacketSize=65536):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # soketi oluştur ve server olarak ata
@@ -28,14 +32,17 @@ earth_radius = 6371000
 
 lastMessages = []
 
+
 def calculate_cartesian_distance(point1, point2):
-    return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
+    return np.sqrt((point2[0] - point1[0]) ** 2 + (point2[1] - point1[1]) ** 2)
+
 
 def predict_new_position(current_position, heading, speed, time_interval=1):
     heading_radians = math.radians(heading)
     dx = speed * math.cos(heading_radians) * time_interval
     dy = speed * math.sin(heading_radians) * time_interval
     return current_position[0] + dx, current_position[1] + dy
+
 
 def haversine(lat1, lon1, lat2, lon2):
     # Convert latitude and longitude from degrees to radians
@@ -78,7 +85,9 @@ def readMessageUDP(IP='', Port=0, PacketSize=65536):
     a = client.recv(PacketSize)
     return a.decode("utf-8")
 
+
 aircraft_data = {}
+
 
 def predict_new_position_based_on_last_n_points(data, n=5):
     features = []
@@ -93,13 +102,31 @@ def predict_new_position_based_on_last_n_points(data, n=5):
         targets.append(target)
     return np.array(features), np.array(targets)
 
+
 takim_numaralari = []
+
+first_guess = True
+
+datacount = 0
+
+predicted_positions = {}
+#two dimentiional dictionary
+actual_positions = {}
+data = None
 while True:
-    # Take input from tcp server that is running on the other side msg[0], "127.0.0.1", 2589, receive=False, compress=False
+    old_data = data
     data = listenTCP("127.0.0.1", 2589)
 
-    # example data {"sunucusaati":{"saat":14,"dakika":9,"saniye":59,"milisaniye":903},"konumBilgileri":[{"takim_numarasi":3,"iha_enlem":41.5132,"iha_boylam":36.1189,"iha_irtifa":-0.5,"iha_dikilme":6.2706,"iha_yonelme":100.3472,"iha_yatis":2.5268,"zaman_farki":1667.0},{"takim_numarasi":8,"iha_enlem":41.51321,"iha_boylam":36.11896,"iha_irtifa":0.007,"iha_dikilme":0.0,"iha_yonelme":103.0,"iha_yatis":0.0,"zaman_farki":1132.0},{"takim_numarasi":11,"iha_enlem":41.5130959,"iha_boylam":36.119297,"iha_irtifa":-1.226,"iha_dikilme":-1.32590342,"iha_yonelme":44.0,"iha_yatis":1.31732583,"zaman_farki":1817.0},{"takim_numarasi":12,"iha_enlem":41.51314,"iha_boylam":36.1190643,"iha_irtifa":0.001,"iha_dikilme":-0.184152573,"iha_yonelme":96.1219,"iha_yatis":0.7862835,"zaman_farki":1258.0},{"takim_numarasi":15,"iha_enlem":41.5130959,"iha_boylam":36.11897,"iha_irtifa":-3.89,"iha_dikilme":-5.0,"iha_yonelme":82.0,"iha_yatis":0.0,"zaman_farki":413.0},{"takim_numarasi":16,"iha_enlem":41.513176,"iha_boylam":36.1189651,"iha_irtifa":-7.816,"iha_dikilme":-1.2220856,"iha_yonelme":79.9404755,"iha_yatis":2.89447761,"zaman_farki":1246.0},{"takim_numarasi":22,"iha_enlem":41.51314,"iha_boylam":36.1191368,"iha_irtifa":0.001,"iha_dikilme":2.09852314,"iha_yonelme":82.16577,"iha_yatis":1.5617739,"zaman_farki":1488.0}]}
+    if not first_guess:
 
+        print("actual position for takim_numarasi = 3: ", actual_positions[3][datacount])
+        print("predicted position for takim_numarasi = 3: ", predicted_positions[3][datacount])
+        print("error for takim_numarasi = 3: ",
+              calculate_cartesian_distance(actual_positions[3][datacount], predicted_positions[3][datacount]))
+    else:
+        first_guess = False
+
+    datacount += 1
     json_data = json.loads(data)
     # Extract relevant data from the JSON
     timestamp = json_data["sunucusaati"]
@@ -142,13 +169,21 @@ while True:
             aircraft_data[takim_numarasi].append(data_row)
 
     for takim_numarasi in takim_numaralari:
+        #    actual_positions[takim_numarasi] = {}
+        #IndexError: list assignment index out of range
+        if takim_numarasi not in actual_positions:
+            actual_positions[takim_numarasi] = {}
+            predicted_positions[takim_numarasi] = {}
         airdata = []
         for data in aircraft_data[takim_numarasi]:
             airdata.append(data)
         window = airdata[-5:]
-        print(window)
-        coords = window[['iha_enlem_meters', 'iha_boylam_meters']].values
-        timestamps = window['sent_time']
+
+        df = pd.DataFrame(window)
+        coords = df[['iha_enlem_meters', 'iha_boylam_meters']].values
+        df = pd.DataFrame(window)
+
+        timestamps = df['sent_time']
         speeds = []
         for i in range(1, len(coords)):
             time_diff = (timestamps.iloc[i] - timestamps.iloc[i - 1]).total_seconds()
@@ -156,10 +191,14 @@ while True:
             speeds.append(distance / time_diff if time_diff != 0 else 0)
         average_speed = sum(speeds) / len(speeds) if speeds else 0
         current_position = coords[-1]
-        current_heading = window.iloc[-1]['iha_yonelme']
+        df = pd.DataFrame(window)
+
+        current_heading = df.iloc[-1]['iha_yonelme']
         new_position = predict_new_position(current_position, current_heading, average_speed)
-        print(new_position)
-        print(current_position)
+        print("current position: ", current_position)
+        print("takim numarasi: ", takim_numarasi)
+        print("datacount: ", datacount)
+        actual_positions[takim_numarasi][datacount] = current_position
+        predicted_positions[takim_numarasi][datacount + 1] = new_position
 
-#print all data in aircraft_data for aircraft with takim_numarasi = 3
-
+# print all data in aircraft_data for aircraft with takim_numarasi = 3

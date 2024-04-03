@@ -123,7 +123,12 @@ def Telemend(telList, dir):
         b += 1
 
 
-if (SendTekno):
-    Thread(target=TeknoSend, args=(teknoTelemFiles, dirTek),daemon=True).start()
+#if only send teknotelem
+if (SendTekno and not SendTelem):
+    TeknoSend(teknoTelemFiles, dirTek)
+elif (SendTelem and not SendTekno):
+    Telemend(myTelemFiles, dirTel)
+elif (SendTelem and SendTekno):
+    Thread(target=TeknoSend, args=(teknoTelemFiles, dirTek), daemon=True).start()
+    Telemend(myTelemFiles, dirTel)
 
-Telemend(myTelemFiles, dirTel)
